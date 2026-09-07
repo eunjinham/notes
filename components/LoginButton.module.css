@@ -1,0 +1,32 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #24292f;
+  border-radius: 6px;
+  background: #24292f;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #1b1f24;
+  border-color: #1b1f24;
+}
+
+.button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
