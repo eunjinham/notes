@@ -47,11 +47,20 @@ function SaveIcon() {
   );
 }
 
-export default function SaveButton({ disabled = false }) {
+export default function SaveButton({
+  disabled = false,
+  pending = false,
+  onClick,
+}) {
   return (
-    <button type="button" className={styles.button} disabled={disabled}>
+    <button
+      type="button"
+      className={styles.button}
+      disabled={disabled || pending}
+      onClick={onClick}
+    >
       <SaveIcon />
-      저장
+      {pending ? "저장 중…" : "저장"}
     </button>
   );
 }

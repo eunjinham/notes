@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./SolidButton.module.css";
 
-function PencilIcon() {
+function EditIcon() {
   return (
     <svg
       className={styles.icon}
@@ -25,16 +25,11 @@ function PencilIcon() {
   );
 }
 
-export default function NewPostButton({ withLabel = false, fullWidth = false }) {
+export default function EditPostButton({ postId }) {
   return (
-    <Link
-      href="/posts/new"
-      className={`${styles.button} ${withLabel ? "" : styles.iconOnly} ${fullWidth ? styles.fullWidth : ""}`}
-      aria-label="글쓰기"
-      title="글쓰기"
-    >
-      <PencilIcon />
-      {withLabel ? "글쓰기" : null}
+    <Link href={`/posts/${postId}/edit`} className={styles.button}>
+      <EditIcon />
+      수정
     </Link>
   );
 }

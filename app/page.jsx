@@ -1,8 +1,22 @@
+import { redirect } from "next/navigation";
 import NewPostButton from "@/components/NewPostButton";
+import Pagination from "@/components/Pagination";
+import PostList from "@/components/PostList";
+import PostSearchForm from "@/components/PostSearchForm";
 import Welcome from "@/components/Welcome";
+import {
+  POSTS_PAGE_SIZE,
+  buildListHref,
+  escapeIlike,
+  hasListFilters,
+  parseListFilters,
+  parsePage,
+  toCreatedAtEnd,
+  toCreatedAtStart,
+} from "@/lib/posts";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -10,6 +24,41 @@ export default async function HomePage() {
 
   if (!user) {
     return <Welcome />;
+  }
+
+  const params = await searchParams;
+  const filters = parseListFilters(params);
+  const page = parsePage(params?.page);
+  const from = (page - 1) * POSTS_PAGE_SIZE;
+  const to = from + POSTS_PAGE_SIZE - 1;
+
+  let query = supabase
+    .from("posts")
+    .select("id, title, created_at, updated_at", { count: "exact" })
+    .order("updated_at", { ascending: false })
+    .range(from, to);
+
+  if (filters.title) {
+    query = query.ilike("title", `%${escapeIlike(filters.title)}%`);
+  }
+
+  if (!filters.invalidRange) {
+    if (filters.from) {
+      query = query.gte("created_at", toCreatedAtStart(filters.from));
+    }
+
+    if (filters.to) {
+      query = query.lte("created_at", toCreatedAtEnd(filters.to));
+    }
+  }
+
+  const { data: posts, count } = await query;
+
+  const total = count ?? 0;
+  const totalPages = Math.ceil(total / POSTS_PAGE_SIZE);
+
+  if (totalPages > 0 && page > totalPages) {
+    redirect(buildListHref({ page: totalPages, ...filters }));
   }
 
   return (
@@ -21,10 +70,17 @@ export default async function HomePage() {
         </div>
         <NewPostButton withLabel />
       </div>
-      <section className="empty-state">
-        <strong>아직 글이 없습니다</strong>
-        글 목록은 이후 단계에서 연결합니다.
-      </section>
+      <PostSearchForm
+        key={`${filters.title}-${filters.from}-${filters.to}-${filters.invalidRange}`}
+        title={filters.title}
+        from={filters.from}
+        to={filters.to}
+        invalidRange={filters.invalidRange}
+      />
+      <PostList posts={posts ?? []} filtered={hasListFilters(filters)} />
+      {total > 0 ? (
+        <Pagination page={page} totalPages={totalPages} filters={filters} />
+      ) : null}
     </main>
   );
 }

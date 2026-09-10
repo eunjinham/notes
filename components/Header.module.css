@@ -9,12 +9,18 @@
 }
 
 .inner {
-  width: min(960px, calc(100% - 40px));
+  width: calc(100% - 40px);
   margin: 0 auto;
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .logo {

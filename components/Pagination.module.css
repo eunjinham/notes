@@ -1,0 +1,54 @@
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #c9c8c4;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.link:hover {
+  background: var(--bg-subtle);
+}
+
+.current {
+  background: #222222;
+  border-color: #222222;
+  color: #fff;
+  cursor: default;
+}
+
+.current:hover {
+  background: #222222;
+}
+
+.disabled {
+  color: var(--text-muted);
+  opacity: 0.5;
+  cursor: default;
+}
+
+.disabled:hover {
+  background: var(--bg);
+}
+
+.ellipsis {
+  min-width: 20px;
+  text-align: center;
+  color: var(--text-muted);
+}

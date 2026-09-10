@@ -1,3 +1,4 @@
+import AppSidebar from "@/components/AppSidebar";
 import Header from "@/components/Header";
 import "./globals.css";
 
@@ -12,7 +13,10 @@ export default function RootLayout({ children }) {
       <body>
         <div className="app-shell">
           <Header />
-          {children}
+          <div className="app-body">
+            <AppSidebar />
+            <div className="app-main">{children}</div>
+          </div>
         </div>
       </body>
     </html>

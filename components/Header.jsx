@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LoginButton from "@/components/LoginButton";
 import LogoutButton from "@/components/LogoutButton";
+import SidebarToggle from "@/components/SidebarToggle";
 import { getGithubUsername } from "@/lib/auth/user";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./Header.module.css";
@@ -14,9 +15,12 @@ export default async function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link href="/" className={styles.logo}>
-          Notes
-        </Link>
+        <div className={styles.brand}>
+          {user ? <SidebarToggle /> : null}
+          <Link href="/" className={styles.logo}>
+            Notes
+          </Link>
+        </div>
         <nav className={styles.nav}>
           {user ? (
             <>

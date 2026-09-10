@@ -8,25 +8,29 @@ Notion처럼 블록 단위로 글을 작성·조회·수정·삭제할 수 있�
 1. **골격** — Next.js(JS) 생성, 레이아웃/빈 페이지
    - [x] 앱 생성 및 패키지 설치 (`@supabase/*`, `@blocknote/*`)
    - [x] 레이아웃, 헤더, 라우트 뼈대
+   - [x] 로그인 후 사이드바 (홈, 글쓰기, 글 목록)
 2. **DB** — `posts` 테이블 + RLS
    - [x] 테이블, `updated_at` 트리거, RLS 정책
 3. **인증** — GitHub OAuth + 쿠키 세션 (Zustand 없음)
-   - [ ] GitHub OAuth 앱 + Supabase Provider (Dashboard에서 직접 설정)
+   - [x] GitHub OAuth 앱 + Supabase Provider (Dashboard에서 직접 설정)
    - [x] `.env.local` (프로젝트 URL + anon/publishable key)
    - [x] `@supabase/ssr` 클라이언트 3종 (브라우저 / 서버 / proxy 헬퍼)
    - [x] GitHub 소셜 로그인 + `/auth/callback`에서 세션 교환
    - [x] 로그인/로그아웃 버튼 컴포넌트
    - [x] 보호된 라우트: `proxy.js`의 `getUser()` + 서버 리다이렉트
 4. **에디터** — BlockNote (클라이언트 전용)
-   - [ ] `Editor` + `dynamic(..., { ssr: false })`
-   - [ ] `/posts/new`에서 타이핑 확인
+   - [x] `Editor` + `dynamic(..., { ssr: false })`
+   - [x] `/posts/new`에서 타이핑 확인
+   - [x] 포멧팅 툴바기능 추가
 5. **CRUD** — 작성·목록·조회·수정·삭제
-   - [ ] 작성 저장 → 상세 이동
-   - [ ] 홈 목록 / 읽기 전용 조회
-   - [ ] 수정·삭제 (작성자만)
+   - [x] 작성 저장 → 상세 이동
+   - [x] 홈 목록 / 읽기 전용 조회
+   - [x] 수정·삭제 (작성자만)
+   - [x] 제목이 없을 경우 첫번째 블록을 제목으로 자동 치환
 6. **점검** — 권한·예외
-   - [ ] 비로그인 작성 차단, 타인 글 접근 거부
-   - [ ] 빈 제목, 없는 id, 저장 실패 처리
+   - [x] 비로그인 작성 차단, 타인 글 접근 거부
+   - [x] 없는 id, 저장 실패 처리
+   - [x] 잘못된 id, 수정·삭제 0건, 세션 만료, 커스텀 404
 
 ---
 
@@ -146,6 +150,7 @@ npm install @blocknote/core @blocknote/react @blocknote/mantine
 │   ├── PostForm.jsx             # 제목 + 에디터 + 저장
 │   ├── PostList.jsx
 │   ├── Header.jsx
+│   ├── Sidebar.jsx              # 로그인 후 좌측 메뉴
 │   ├── LoginButton.jsx          # GitHub 로그인 (클라이언트)
 │   └── LogoutButton.jsx         # 로그아웃 (클라이언트)
 ├── lib/
@@ -303,6 +308,12 @@ router.refresh();
 
 ## 7. BlockNote 연동
 
+#참고사항
+- [Blocknote 에디터 설치방법](https://www.blocknotejs.org/docs/getting-started)
+- [Blocknote 에디터 툴바 설정](https://www.blocknotejs.org/examples/ui-components/formatting-toolbar-buttons)
+- [Blocknote 에디터 저장기능](https://www.blocknotejs.org/examples/backend/saving-loading)
+- [Blocknote 에디터 저장기능2](https://www.blocknotejs.org/docs/foundations/supported-formats) 
+
 ### 7.1 Next.js에서 쓰는 방법
 
 1. `components/Editor.jsx` — `"use client"`, `useCreateBlockNote`, `BlockNoteView`
@@ -447,9 +458,13 @@ service role 키는 프론트에 넣지 않는다.
 
 ### Phase 6 — 권한·예외 점검
 
-- 비로그인으로 `/posts/new` 접근 → `/login`
-- 다른 사용자 글 URL 직접 접근 → 없거나 거부
-- 제목 빈 값, 저장 실패, 존재하지 않는 id 처리
+- 비로그인으로 `/posts/new`, `/posts/[id]`, `/posts/[id]/edit` 접근 → `/`
+- 다른 사용자 글 URL 직접 접근 → 404
+- 잘못된 id 형식 → 404
+- 제목 빈 값(첫 블록/`제목 없음`), 저장 실패 메시지
+- 수정·삭제가 0건이면 성공으로 처리하지 않음
+- 저장 중 세션 만료 → `/`
+- 커스텀 404: 글을 찾을 수 없습니다 + 목록 이동
 
 ---
 
